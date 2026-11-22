@@ -1,4 +1,4 @@
-from exceptions import DataTidakValidError
+from exceptions import DataTidakValidError, KapasitasPenuhError, SudahTerdaftarError
 from modul import Modul
 from progres import Progres
 
@@ -49,9 +49,9 @@ class Course:
 
     def daftar(self, mahasiswa):
         if mahasiswa in self._peserta:            # memakai __eq__
-            raise ValueError(f"{mahasiswa.nama} sudah terdaftar")
+            raise SudahTerdaftarError(self._kode, mahasiswa.nim)
         if len(self._peserta) >= self.__kapasitas:
-            raise ValueError("Kapasitas course penuh")
+            raise KapasitasPenuhError(self._kode, self.__kapasitas)
         self._peserta.append(mahasiswa)
         for konten in self.semua_konten():
             mahasiswa.tambah_progres(Progres(mahasiswa, konten))
