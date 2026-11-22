@@ -1,3 +1,4 @@
+from exceptions import DataTidakValidError
 from modul import Modul
 from progres import Progres
 
@@ -26,10 +27,12 @@ class Course:
 
     @kapasitas.setter
     def kapasitas(self, nilai):
+        if not isinstance(nilai, int):
+            raise TypeError("Kapasitas harus berupa bilangan bulat")
         if nilai <= 0:
-            raise ValueError("Kapasitas harus > 0")
+            raise DataTidakValidError("kapasitas", nilai, "harus lebih dari 0")
         if nilai < len(getattr(self, "_peserta", [])):
-            raise ValueError("Kapasitas kurang dari jumlah peserta")
+            raise DataTidakValidError("kapasitas", nilai, "kurang dari jumlah peserta saat ini")
         self.__kapasitas = nilai
 
     @property
