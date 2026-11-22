@@ -1,5 +1,5 @@
 from course import Course
-from exceptions import DataTidakValidError
+from exceptions import AksesDitolakError, DataTidakValidError
 
 class User:
     jumlah_user = 0  # class attribute: penghitung seluruh user
@@ -64,6 +64,11 @@ class Instruktur(User):
         course = Course(kode, judul, kapasitas, self)
         self._daftar_course.append(course)
         return course
+
+    def tambah_modul(self, course, judul):
+        if course not in self._daftar_course:
+            raise AksesDitolakError(self.nama, f"mengubah course {course.kode}")
+        return course.tambah_modul(judul)
 
 
 class Mahasiswa(User):
