@@ -66,6 +66,8 @@ class Course:
         raise KontenTidakDitemukanError(self._kode, konten.judul)
 
     def persentase_selesai(self, mahasiswa):
+        if mahasiswa not in self._peserta:
+            raise BelumTerdaftarError(self._kode, mahasiswa.nim)
         total = len(self.semua_konten())
         selesai = sum(1 for p in mahasiswa.daftar_progres if p.status == "selesai")
         return 100 * selesai / total if total else 0
