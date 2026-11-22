@@ -52,3 +52,74 @@ Yang dikelola sistem adalah course, modul, konten, data pengguna, dan progres be
 | `KontenTidakDitemukanError` | `LMSError` | `kode_course`, `judul_konten` | Konten yang diselesaikan tidak ada di course | `Course.selesaikan_konten` | Ditangkap lewat `except LMSError` |
 | `NilaiDiperlukanError` | `LMSError` | `judul_konten` | Kuis atau tugas diselesaikan tanpa nilai | `Progres.selesaikan` | Pesan penolakan pada Skenario 4 |
 | `AksesDitolakError` | `LMSError` | `nama_pengguna`, `aksi` | Instruktur mengubah course yang bukan miliknya | `Instruktur.tambah_modul` | Pesan penolakan pada Skenario 4 |
+
+
+## 6. Cara Menjalankan dan Contoh Output
+
+```bash
+git clone https://github.com/suartanagit/mini-lms.git
+cd mini-lms
+python src/main.py
+```
+
+Contoh output:
+
+```text
+=== Skenario 1: alur normal ===
+Course PBO-01 - Pemrograman Berorientasi Objek (2/2)
+Progres Budi: 66.7%
+[LOG] skenario 1 selesai
+
+=== Skenario 2: aturan pendaftaran ===
+[LOG] pendaftaran Caca gagal: Course PBO-01 penuh (kapasitas 2 peserta)
+Ditolak (PBO-01, kapasitas 2): Course PBO-01 penuh (kapasitas 2 peserta)
+[LOG] pemrosesan pendaftaran Caca selesai
+Ditolak: Mahasiswa 2301 sudah terdaftar di course PBO-01
+[LOG] pemrosesan pendaftaran Budi selesai
+
+=== Skenario 3: validasi data ===
+[kapasitas -5] DataTidakValidError field=kapasitas: kapasitas tidak valid (-5): harus lebih dari 0
+[nilai tugas 150] DataTidakValidError field=nilai: nilai tidak valid (150): harus di antara 0 dan 100
+[nilai tugas 'A'] TypeError: Nilai harus berupa angka
+[format data salah] DataTidakValidError field=data mahasiswa: data mahasiswa tidak valid ('2304;Dewi'): format harus 'nim;nama;email' (penyebab: ValueError)
+
+=== Skenario 4: aturan bisnis lain ===
+[modul oleh instruktur lain] Ditolak: Pak Adi tidak berhak mengubah course PBO-01
+[kuis tanpa nilai] Ditolak: Konten 'Kuis Class' memerlukan nilai untuk diselesaikan
+
+Jumlah user: 5 | Jumlah konten: 3
+```
+
+
+## 7. Pembagian Peran
+#### Tahap 1: Kode awal Mini LMS (dari UTS)
+| Anggota  | File yang di-push                 | Isi                                                                                                                |
+| -------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Suartana | `src/pengguna.py`, `src/main.py`  | Class `User`, `Instruktur`, `Mahasiswa`; program utama. Juga membuat repository, struktur folder, dan commit awal. |
+| Pasek    | `src/konten.py`, `src/modul.py`   | `DapatDinilaiMixin`, `Konten`, `Video`, `Kuis`, `Tugas`; class `Modul`                                             |
+| Siva     | `src/progres.py`, `src/course.py` | Class `Progres` dan `Course`                                                                                       |
+
+#### Tahap 2: Exception Handling
+| Anggota  | Pekerjaan                                                                                                                                                                                                                                                                                                                                                                  | File yang dikerjakan                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Suartana | Menerapkan exception pada class pengguna (setter `nama` dan `email`, `Mahasiswa.dari_string` dengan `raise ... from`, `Instruktur.tambah_modul`). Memperbarui program utama: fungsi `daftarkan` dengan re-raise, Skenario 1 sampai 4, blok `try/except/else/finally`, urutan `except`, dan contoh EAFP. Mengelola repository (membuat repository dan menambahkan anggota). | `src/pengguna.py`, `src/main.py`                               |
+| Pasek    | Merancang hierarki custom exception (`LMSError` dan 7 turunannya). Menerapkan exception pada konten (setter `Video.durasi_menit`). Membuat class diagram revisi dengan class `«exception»` dan catatan method yang memunculkannya.                                                                                                                                         | `src/exceptions.py`, `src/konten.py`, `docs/class-diagram.png` |
+| Siva     | Menerapkan aturan bisnis pada progres dan course (setter `Progres.nilai`, `Progres.selesaikan` dengan `NilaiDiperlukanError`, setter `kapasitas`, `daftar`, `selesaikan_konten`, `persentase_selesai`). Menyusun seluruh `README.md`, termasuk tabel aturan bisnis dan daftar custom exception.                                                                            | `src/progres.py`, `src/course.py`, `README.md`                 |
+
+
+## Struktur Repository
+
+```text
+nama-repo/
+ ├── README.md
+ ├── docs/
+ │    └── class-diagram.png
+ └── src/
+      ├── exceptions.py
+      ├── konten.py
+      ├── modul.py
+      ├── progres.py
+      ├── course.py
+      ├── pengguna.py
+      └── main.py
+```
