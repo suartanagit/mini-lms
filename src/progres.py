@@ -1,4 +1,4 @@
-from exceptions import DataTidakValidError
+from exceptions import DataTidakValidError, NilaiDiperlukanError
 from konten import DapatDinilaiMixin
 
 
@@ -32,7 +32,7 @@ class Progres:
     def selesaikan(self, nilai=None):
         if isinstance(self._konten, DapatDinilaiMixin):
             if nilai is None:
-                raise ValueError("Konten ini memerlukan nilai")
+                raise NilaiDiperlukanError(self._konten.judul)
             self.nilai = nilai
             self._status = "selesai" if self._konten.lulus(nilai) else "ulang"
         else:
