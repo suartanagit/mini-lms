@@ -1,4 +1,5 @@
 from course import Course
+from exceptions import DataTidakValidError
 
 class User:
     jumlah_user = 0  # class attribute: penghitung seluruh user
@@ -21,8 +22,10 @@ class User:
 
     @nama.setter
     def nama(self, nilai):
-        if not nilai or not nilai.strip():
-            raise ValueError("Nama tidak boleh kosong")
+        if not isinstance(nilai, str):
+            raise TypeError("Nama harus berupa teks")
+        if not nilai.strip():
+            raise DataTidakValidError("nama", nilai, "tidak boleh kosong")
         self.__nama = nilai.strip()
 
     @property
@@ -31,8 +34,10 @@ class User:
 
     @email.setter
     def email(self, nilai):
+        if not isinstance(nilai, str):
+            raise TypeError("Email harus berupa teks")
         if not User.validasi_email(nilai):
-            raise ValueError(f"Email tidak valid: {nilai}")
+            raise DataTidakValidError("email", nilai, "format harus nama@domain.tld")
         self.__email = nilai
 
     @staticmethod
