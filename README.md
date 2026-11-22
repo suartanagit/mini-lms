@@ -34,3 +34,21 @@ Yang dikelola sistem adalah course, modul, konten, data pengguna, dan progres be
 | 9 | Kuis dan tugas hanya dapat diselesaikan jika disertai nilai | `Progres.selesaikan()` | `NilaiDiperlukanError` |
 | 10 | Hanya instruktur pengampu yang boleh menambah modul ke course | `Instruktur.tambah_modul()` | `AksesDitolakError` |
 | 11 | Data mahasiswa dari string harus berformat `nim;nama;email` | `Mahasiswa.dari_string()` | `DataTidakValidError` (memakai `raise ... from`) |
+
+## 4. Class Diagram Revisi
+
+![Class Diagram](docs/class-diagram.png)
+
+
+## 5. Daftar Custom Exception
+
+| Nama | Class induk | Atribut konteks | Kapan dimunculkan | Method yang memunculkan | Cara program menanganinya |
+|---|---|---|---|---|---|
+| `LMSError` | `Exception` | (base, tanpa atribut) | Tidak dimunculkan langsung; menjadi induk semua exception aplikasi | (tidak ada) | Ditangkap dengan `except LMSError` sebagai penangkap umum |
+| `DataTidakValidError` | `LMSError`, `ValueError` | `field`, `nilai`, `alasan` | Data tidak memenuhi aturan validasi (nama kosong, email salah, durasi, kapasitas, nilai di luar 0-100, format string salah) | Setter `User.nama`, `User.email`, `Video.durasi_menit`, `Course.kapasitas`, `Progres.nilai`; `Mahasiswa.dari_string` | Dicetak beserta `field` dan penyebab (`__cause__`) pada Skenario 3 |
+| `KapasitasPenuhError` | `LMSError` | `kode_course`, `kapasitas` | Pendaftaran melebihi kapasitas course | `Course.daftar` | Dicatat log lalu di-raise ulang di `daftarkan()`, kemudian pendaftaran ditolak di Skenario 2 |
+| `SudahTerdaftarError` | `LMSError` | `kode_course`, `nim` | Mahasiswa mendaftar dua kali ke course yang sama | `Course.daftar` | Pesan penolakan pada Skenario 2 |
+| `BelumTerdaftarError` | `LMSError` | `kode_course`, `nim` | Mahasiswa yang belum terdaftar menyelesaikan konten atau dihitung progresnya | `Course.selesaikan_konten`, `Course.persentase_selesai` | Ditangkap lewat `except LMSError` |
+| `KontenTidakDitemukanError` | `LMSError` | `kode_course`, `judul_konten` | Konten yang diselesaikan tidak ada di course | `Course.selesaikan_konten` | Ditangkap lewat `except LMSError` |
+| `NilaiDiperlukanError` | `LMSError` | `judul_konten` | Kuis atau tugas diselesaikan tanpa nilai | `Progres.selesaikan` | Pesan penolakan pada Skenario 4 |
+| `AksesDitolakError` | `LMSError` | `nama_pengguna`, `aksi` | Instruktur mengubah course yang bukan miliknya | `Instruktur.tambah_modul` | Pesan penolakan pada Skenario 4 |
