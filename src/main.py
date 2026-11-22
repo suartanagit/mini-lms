@@ -1,5 +1,15 @@
+from exceptions import KapasitasPenuhError
 from konten import Konten, Kuis
 from pengguna import Instruktur, Mahasiswa, User
+
+
+def daftarkan(course, mahasiswa):
+    """Mendaftarkan mahasiswa; mencatat log lalu melempar ulang (re-raise)."""
+    try:
+        course.daftar(mahasiswa)
+    except KapasitasPenuhError as e:
+        print(f"[LOG] pendaftaran {mahasiswa.nama} gagal: {e}")
+        raise
 
 
 if __name__ == "__main__":
