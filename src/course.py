@@ -1,4 +1,4 @@
-from exceptions import DataTidakValidError, KapasitasPenuhError, SudahTerdaftarError
+from exceptions import (BelumTerdaftarError, DataTidakValidError, KapasitasPenuhError, KontenTidakDitemukanError, SudahTerdaftarError)
 from modul import Modul
 from progres import Progres
 
@@ -55,6 +55,15 @@ class Course:
         self._peserta.append(mahasiswa)
         for konten in self.semua_konten():
             mahasiswa.tambah_progres(Progres(mahasiswa, konten))
+
+    def selesaikan_konten(self, mahasiswa, konten, nilai=None):
+        if mahasiswa not in self._peserta:
+            raise BelumTerdaftarError(self._kode, mahasiswa.nim)
+        for progres in mahasiswa.daftar_progres:
+            if progres.konten is konten:
+                progres.selesaikan(nilai)
+                return progres
+        raise KontenTidakDitemukanError(self._kode, konten.judul)
 
     def persentase_selesai(self, mahasiswa):
         total = len(self.semua_konten())
