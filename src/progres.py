@@ -1,3 +1,4 @@
+from exceptions import DataTidakValidError
 from konten import DapatDinilaiMixin
 
 
@@ -22,8 +23,10 @@ class Progres:
 
     @nilai.setter
     def nilai(self, nilai):
+        if not isinstance(nilai, (int, float)):
+            raise TypeError("Nilai harus berupa angka")
         if not 0 <= nilai <= 100:
-            raise ValueError("Nilai harus 0-100")
+            raise DataTidakValidError("nilai", nilai, "harus di antara 0 dan 100")
         self.__nilai = nilai
 
     def selesaikan(self, nilai=None):
