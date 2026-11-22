@@ -1,3 +1,5 @@
+from exceptions import DataTidakValidError
+
 class DapatDinilaiMixin:
     """Mixin: perilaku penilaian untuk konten yang punya nilai."""
     _nilai_lulus = 0
@@ -40,8 +42,10 @@ class Video(Konten):
 
     @durasi_menit.setter
     def durasi_menit(self, nilai):
+        if not isinstance(nilai, (int, float)):
+            raise TypeError("Durasi video harus berupa angka")
         if nilai <= 0:
-            raise ValueError("Durasi video harus > 0 menit")
+            raise DataTidakValidError("durasi_menit", nilai, "harus lebih dari 0 menit")
         self.__durasi = nilai
 
     def deskripsi(self):                  # override
