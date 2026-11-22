@@ -1,4 +1,4 @@
-from exceptions import KapasitasPenuhError, LMSError, SudahTerdaftarError
+from exceptions import (AksesDitolakError, DataTidakValidError, KapasitasPenuhError, LMSError, NilaiDiperlukanError, SudahTerdaftarError)
 from konten import Konten
 from pengguna import Instruktur, Mahasiswa, User
 
@@ -53,3 +53,36 @@ if __name__ == "__main__":
             print(mhs.nama, "berhasil mendaftar")
         finally:
             print(f"[LOG] pemrosesan pendaftaran {mhs.nama} selesai")
+
+    # ---- Skenario 3 (gagal): data tidak valid pada setter ----
+    print("\n=== Skenario 3: validasi data ===")
+    percobaan = [
+        ("kapasitas -5", lambda: setattr(course, "kapasitas", -5)),
+        ("nilai tugas 150", lambda: course.selesaikan_konten(budi, tugas, 150)),
+        ("nilai tugas 'A'", lambda: course.selesaikan_konten(budi, tugas, "A")),
+        ("format data salah", lambda: Mahasiswa.dari_string("2304;Dewi")),
+    ]
+    for nama, aksi in percobaan:
+        try:
+            aksi()
+        except DataTidakValidError as e:
+            sebab = f" (penyebab: {type(e.__cause__).__name__})" if e.__cause__ else ""
+            print(f"[{nama}] DataTidakValidError field={e.field}: {e}{sebab}")
+        except TypeError as e:
+            print(f"[{nama}] TypeError: {e}")
+
+    # ---- Skenario 4 (gagal): aturan bisnis lain ----
+    print("\n=== Skenario 4: aturan bisnis lain ===")
+    dosen_lain = Instruktur("I02", "Pak Adi", "adi@kampus.ac.id", "Basis Data")
+    for nama, aksi in [
+        ("modul oleh instruktur lain", lambda: dosen_lain.tambah_modul(course, "Modul Liar")),
+        ("kuis tanpa nilai", lambda: course.selesaikan_konten(budi, kuis)),
+    ]:
+        try:
+            aksi()
+        except AksesDitolakError as e:
+            print(f"[{nama}] Ditolak: {e}")
+        except NilaiDiperlukanError as e:
+            print(f"[{nama}] Ditolak: {e}")
+
+    print("\nJumlah user:", User.jumlah_user, "| Jumlah konten:", Konten.jumlah_konten)
