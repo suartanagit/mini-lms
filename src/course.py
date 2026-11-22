@@ -43,3 +43,26 @@ class Course:
 
     def semua_konten(self):
         return [k for m in self._daftar_modul for k in m.daftar_konten]
+
+    def daftar(self, mahasiswa):
+        if mahasiswa in self._peserta:            # memakai __eq__
+            raise ValueError(f"{mahasiswa.nama} sudah terdaftar")
+        if len(self._peserta) >= self.__kapasitas:
+            raise ValueError("Kapasitas course penuh")
+        self._peserta.append(mahasiswa)
+        for konten in self.semua_konten():
+            mahasiswa.tambah_progres(Progres(mahasiswa, konten))
+
+    def persentase_selesai(self, mahasiswa):
+        total = len(self.semua_konten())
+        selesai = sum(1 for p in mahasiswa.daftar_progres if p.status == "selesai")
+        return 100 * selesai / total if total else 0
+
+    def __eq__(self, lain):
+        return isinstance(lain, Course) and self._kode == lain._kode
+
+    def __hash__(self):
+        return hash(self._kode)
+
+    def __str__(self):
+        return f"Course {self._kode} - {self.judul} ({len(self._peserta)}/{self.kapasitas})"
