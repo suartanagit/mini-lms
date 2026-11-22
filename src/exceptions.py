@@ -37,3 +37,29 @@ class BelumTerdaftarError(LMSError):
         self.kode_course = kode_course
         self.nim = nim
         super().__init__(f"Mahasiswa {nim} belum terdaftar di course {kode_course}")
+
+
+class KontenTidakDitemukanError(LMSError):
+    """Konten yang dituju tidak ada di dalam course."""
+
+    def __init__(self, kode_course, judul_konten):
+        self.kode_course = kode_course
+        self.judul_konten = judul_konten
+        super().__init__(f"Konten '{judul_konten}' tidak ada di course {kode_course}")
+
+
+class NilaiDiperlukanError(LMSError):
+    """Konten kuis/tugas diselesaikan tanpa nilai."""
+
+    def __init__(self, judul_konten):
+        self.judul_konten = judul_konten
+        super().__init__(f"Konten '{judul_konten}' memerlukan nilai untuk diselesaikan")
+
+
+class AksesDitolakError(LMSError):
+    """Pengguna tidak berhak melakukan aksi tersebut."""
+
+    def __init__(self, nama_pengguna, aksi):
+        self.nama_pengguna = nama_pengguna
+        self.aksi = aksi
+        super().__init__(f"{nama_pengguna} tidak berhak {aksi}")
