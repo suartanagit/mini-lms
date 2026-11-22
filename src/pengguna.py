@@ -84,7 +84,10 @@ class Mahasiswa(User):
 
     @classmethod
     def dari_string(cls, data):           # alternative constructor
-        nim, nama, email = data.split(";")
+        try:
+            nim, nama, email = data.split(";")
+        except ValueError as e:
+            raise DataTidakValidError("data mahasiswa", data, "format harus 'nim;nama;email'") from e
         return cls(nim, nama, email)
 
     def tambah_progres(self, progres):
